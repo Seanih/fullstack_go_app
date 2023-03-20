@@ -5,6 +5,7 @@ import styles from '@/styles/Home.module.css';
 import { Box } from '@mantine/core';
 import useSWR from 'swr';
 import { json } from 'stream/consumers';
+import AddTodo from '@/components/AddTodo';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -28,6 +29,7 @@ export default function Home() {
 				<link rel='icon' href='/favicon.ico' />
 			</Head>
 
+			<AddTodo />
 			<Box>{JSON.stringify(data)}</Box>
 		</>
 	);
