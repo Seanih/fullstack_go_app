@@ -21,30 +21,50 @@ func main() {
 
 	todos := []Todo{}
 
-	app.Get("/healthcheck", func(c *fiber.Ctx) error {
-		return c.SendString(("Works!"))
+	app.Get("/api/todos", func(c *fiber.Ctx) error {
+		if len(todos) > 0 {
+			return c.JSON(todos)
+		}
+
+		return c.SendString("no items have been added yet")
 	})
 
 	app.Post("/api/todos", func(c *fiber.Ctx) error {
 		// initialize new Todo struct
-		todo := &Todo{}
+		newTodo := &Todo{}
 
 		// handle parsing error if needed
-		if err := c.BodyParser(todo); err != nil {
+		if err := c.BodyParser(newTodo); err != nil {
 			return err
 		}
 
 		// create new IDs for new Todo struct
-		todo.ID = len(todos) + 1
+		newTodo.ID = len(todos) + 1
 
 		// add new Todo struct to slice
-		todos = append(todos, *todo)
+		todos = append(todos, *newTodo)
 
 		// return the updated slice as JSON
 		return c.JSON(todos)
 	})
 
-	app.Patch("/api/todos/:id/done", func(c *fiber.Ctx) error {
+	app.Get("/api/todos/:id", func(c *fiber.Ctx) error {
+		id, err := c.ParamsInt("id")
+
+		if err != nil {
+			return c.Status(400).SendString("Invalid ID")
+		}
+
+		for _, value := range todos {
+			if value.ID == id {
+				return c.JSON(value)
+			}
+		}
+
+		return c.SendString("no item matching that ID")
+	})
+
+	app.Patch("/api/todos/:id", func(c *fiber.Ctx) error {
 		id, err := c.ParamsInt("id")
 
 		if err != nil {
